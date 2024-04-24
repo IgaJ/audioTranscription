@@ -2,6 +2,7 @@ import pyaudio
 import wave
 from pydub import AudioSegment
 import os
+import whisper
 os.environ["PATH"] += os.pathsep + "C:/ffmpeg/bin"
 
 # ustawienia nagrywania
@@ -9,7 +10,7 @@ FORMAT = pyaudio.paInt16    # format próbkowania
 CHANNELS = 1                # liczba kanałów audio
 RATE = 44100                # częstotliwość próbkowania np. 44100 Hz
 CHUNK = 1024                # liczba próbek na ramkę
-RECORD_SECONDS = 5          # czas nagrywania w sekundach
+RECORD_SECONDS = 10         # czas nagrywania w sekundach
 
 # inicjalizacja obiektu PyAudio
 audio = pyaudio.PyAudio()
@@ -33,7 +34,7 @@ stream.close()
 audio.terminate()
 
 # zapis do pliku WAV
-file_wav = "nagrania.wav"
+file_wav = "nagranie3.wav"
 with wave.open(file_wav, "wb") as wf:
     wf.setnchannels(CHANNELS)
     wf.setsampwidth(audio.get_sample_size(FORMAT))
@@ -41,8 +42,11 @@ with wave.open(file_wav, "wb") as wf:
     wf.writeframes(b"".join(frames))
 
 # konwersja pliku WAV na mp3
-audio_segment = AudioSegment.from_wav(file_wav)
-file_mp3 = "nagrania.mp3"
-audio_segment.export(file_mp3, format="mp3")
+# audio_segment = AudioSegment.from_wav(file_wav)
+# file_mp3 = "nagrania.mp3"
+# audio_segment.export(file_mp3, format="mp3")
 
-print(f"Zapisano lik MP3: {file_mp3}")
+model = whisper.load_model("base")
+audio_path = file_wav # "C:/Users/Kompiuta/PycharmProjects/transcribe_audio_files/nagranie2.wav"
+result = model.transcribe(audio_path)
+print(result["text"])
